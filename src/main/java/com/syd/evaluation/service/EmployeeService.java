@@ -1,12 +1,12 @@
 package com.syd.evaluation.service;
 
 import com.syd.evaluation.persistence.entity.Employee;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 public interface EmployeeService {
 
-    Flux<Employee> getAll();
+    List<Employee> getAll();
 
-    Mono<Employee> findById(Long id);
+    Employee findById(Long id);
 }

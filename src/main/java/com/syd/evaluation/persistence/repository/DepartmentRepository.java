@@ -1,11 +1,9 @@
 package com.syd.evaluation.persistence.repository;
 
-import com.syd.evaluation.persistence.entity.Employee;
+import com.syd.evaluation.persistence.entity.Department;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface EmployeeRepository extends JpaRepository<Employee, Long> {
-
-    Employee findByEmail(String email);
+public interface DepartmentRepository extends JpaRepository<Department, Long> {
 }
