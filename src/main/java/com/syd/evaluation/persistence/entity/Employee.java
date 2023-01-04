@@ -7,37 +7,42 @@ import jakarta.persistence.OneToMany;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 public class Employee extends BaseEntity implements Serializable, UserDetails {
 
-    @Serial
-    private static final long serialVersionUID = 1554775960000020573L;
 
+    @Serial
+    private static final long serialVersionUID = -5653032393880179646L;
     private String firstName;
     private String lastName;
     private String email;
-    @JsonIgnore
     private String password;
     private Date birthday;
+
+
     @OneToMany(mappedBy = "employee", targetEntity = Role.class, fetch = FetchType.EAGER)
-    private Set<Role> roles;
+    @JsonIgnore
+    private Collection<Role> roles;
+
     @OneToMany(mappedBy = "employee", targetEntity = Department.class, fetch = FetchType.EAGER)
-    private Set<Department> departments;
+    @JsonIgnore
+    private Collection<Department> departments;
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getRoles();
+        return getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 
     @Override
@@ -64,4 +69,5 @@ public class Employee extends BaseEntity implements Serializable, UserDetails {
     public boolean isEnabled() {
         return getActive();
     }
+    
 }
