@@ -28,5 +28,5 @@ public class BaseEntity {
     private Date updated;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Boolean active;
+    private Boolean active = true;
 }

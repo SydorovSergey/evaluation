@@ -9,4 +9,6 @@ public interface EmployeeService {
     List<Employee> getAll();
 
     Employee findById(Long id);
+
+    boolean add(Employee employee);
 }
