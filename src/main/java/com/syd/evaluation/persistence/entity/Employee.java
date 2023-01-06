@@ -1,9 +1,6 @@
 package com.syd.evaluation.persistence.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,19 +8,19 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
-public class Employee extends BaseEntity implements Serializable, UserDetails {
+public class Employee extends BaseEntity implements UserDetails {
 
 
     @Serial
-    private static final long serialVersionUID = -5653032393880179646L;
+    private static final long serialVersionUID = -3629102319111159174L;
     private String firstName;
     private String lastName;
     private String email;
@@ -31,13 +28,20 @@ public class Employee extends BaseEntity implements Serializable, UserDetails {
     private Date birthday;
 
 
-    @OneToMany(mappedBy = "employee", targetEntity = Role.class, fetch = FetchType.EAGER)
-    @JsonIgnore
-    private Collection<Role> roles;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "employee_roles",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles;
 
-    @OneToMany(mappedBy = "employee", targetEntity = Department.class, fetch = FetchType.EAGER)
-    @JsonIgnore
-    private Collection<Department> departments;
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "employee_departments",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "department_id"))
+    private Set<Department> departments;
 
 
     @Override
@@ -69,5 +73,15 @@ public class Employee extends BaseEntity implements Serializable, UserDetails {
     public boolean isEnabled() {
         return getActive();
     }
-    
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", birthday=" + birthday +
+                '}';
+    }
 }
