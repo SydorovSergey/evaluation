@@ -38,4 +38,12 @@ public class EmployeeController {
     public boolean update(@RequestBody Employee employee) {
         return employeeService.update(employee);
     }
+
+
+    @DeleteMapping("{id}")
+    @Operation(summary = "Delete employee",description = "Sets status active true/false")
+    @PreAuthorizeAdminOrDepsAdmin
+    public boolean delete(@PathVariable Long id){
+        return employeeService.delete(id);
+    }
 }
