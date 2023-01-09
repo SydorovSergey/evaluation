@@ -19,4 +19,6 @@ public interface EmployeeService {
 
     @Transactional
     boolean update(Employee employee);
+
+    boolean delete(Long id);
 }

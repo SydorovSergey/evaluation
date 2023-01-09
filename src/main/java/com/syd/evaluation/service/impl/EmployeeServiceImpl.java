@@ -66,7 +66,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee requesterEmployee = EmployeeUtil.getEmployeeFromSecurityContext(SecurityContextHolder.getContext());
 
         // not an admin and not the same employee
-        if (!EmployeeUtil.isAdminOrDepsAdmin(requesterEmployee) || !EmployeeUtil.isAdminSameDepartment(requesterEmployee, empFromDD)){
+        if (!EmployeeUtil.isAdminOrDepsAdmin(requesterEmployee) || !EmployeeUtil.isAdminSameDepartment(requesterEmployee, empFromDD)) {
             if (!requesterEmployee.getId().equals(empFromDD.getId())) return false;
             return false;
         }
@@ -81,6 +81,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         empFromDD.setBirthday(employee.getBirthday());
 
         employeeRepository.save(empFromDD);
+        return true;
+    }
+
+    @Override
+    public boolean delete(Long id) {
+        employeeRepository.findById(id).ifPresent(employee -> {
+            employee.setActive(false);
+            employeeRepository.save(employee);
+        });
         return true;
     }
 }
