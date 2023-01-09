@@ -1,19 +1,20 @@
 package com.syd.evaluation.service;
 
-import com.syd.evaluation.persistence.entity.Department;
+import com.syd.evaluation.persistence.entity.Role;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public interface DepartmentService {
+public interface RoleService{
 
-    Iterable<Department> getAll();
 
-    @Transactional
-    boolean update(Department department);
+    Iterable<Role> getAll();
 
     @Transactional
-    boolean add(Department department);
+    boolean update(Role role);
+
+    @Transactional
+    boolean add (Role role);
 
     @Transactional
     boolean delete(Long id);
