@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -21,7 +23,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Iterable<Employee> getAll() {
-        return employeeRepository.findAll();
+        Employee requesterEmployee = EmployeeUtil.getEmployeeFromSecurityContext(SecurityContextHolder.getContext());
+
+        if (EmployeeUtil.isAdminOrDepsAdmin(requesterEmployee)) return employeeRepository.findAll();
+
+        if (EmployeeUtil.validDepartment(requesterEmployee).isEmpty()) return null;
+
+        List<Employee> list = (List<Employee>) employeeRepository.findAll();
+        return list.stream().filter(employee -> employee.getDepartments().containsAll(requesterEmployee.getDepartments())).toList();
     }
 
     @Override
@@ -66,6 +75,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         empFromDD.setLastName(employee.getLastName());
         //todo check if such an account exists before set email
         empFromDD.setEmail(employee.getEmail());
+        //todo encode decoded pass
         empFromDD.setPassword(passwordEncoder.encode(employee.getPassword()));
         empFromDD.setActive(employee.getActive());
         empFromDD.setBirthday(employee.getBirthday());
