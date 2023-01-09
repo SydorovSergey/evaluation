@@ -15,8 +15,7 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @GetMapping
-    @PreAuthorizeAdminOrDepsAdmin
-    @Operation(summary = "Get list of employees")
+    @Operation(summary = "Get list of employees considering roles and departments")
     public Iterable<Employee> getAll() {
         return employeeService.getAll();
     }
