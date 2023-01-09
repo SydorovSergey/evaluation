@@ -6,11 +6,10 @@ import com.syd.evaluation.service.EmployeeService;
 import com.syd.evaluation.util.EmployeeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +20,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public List<Employee> getAll() {
+    public Iterable<Employee> getAll() {
         return employeeRepository.findAll();
     }
 
@@ -32,9 +31,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public boolean add(Employee employee) {
-        Employee empFromDD = employeeRepository.findByEmail(employee.getEmail());
-
-        if (empFromDD != null) return false;
+        if (!employeeRepository.existsById(employee.getId())) return false;
 
         employee.setPassword(passwordEncoder.encode(employee.getPassword()));
         employeeRepository.save(employee);
@@ -51,5 +48,29 @@ public class EmployeeServiceImpl implements EmployeeService {
         return requesterEmployee.getId().equals(id)
                 || EmployeeUtil.isAdminOrDepsAdmin(requesterEmployee)
                 || EmployeeUtil.isAdminSameDepartment(requesterEmployee, empl) ? empl : null;
+    }
+
+    @Override
+    public boolean update(Employee employee) {
+        Employee empFromDD = employeeRepository.findByEmailAndActiveIsTrue(employee.getEmail());
+        if (empFromDD == null) return false;
+        Employee requesterEmployee = EmployeeUtil.getEmployeeFromSecurityContext(SecurityContextHolder.getContext());
+
+        // not an admin and not the same employee
+        if (!EmployeeUtil.isAdminOrDepsAdmin(requesterEmployee) || !EmployeeUtil.isAdminSameDepartment(requesterEmployee, empFromDD)){
+            if (!requesterEmployee.getId().equals(empFromDD.getId())) return false;
+            return false;
+        }
+
+        empFromDD.setFirstName(employee.getFirstName());
+        empFromDD.setLastName(employee.getLastName());
+        //todo check if such an account exists before set email
+        empFromDD.setEmail(employee.getEmail());
+        empFromDD.setPassword(passwordEncoder.encode(employee.getPassword()));
+        empFromDD.setActive(employee.getActive());
+        empFromDD.setBirthday(employee.getBirthday());
+
+        employeeRepository.save(empFromDD);
+        return true;
     }
 }
